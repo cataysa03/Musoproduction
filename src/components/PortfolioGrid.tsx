@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,10 @@ interface PortfolioGridProps {
   linkPrefix?: string;
 }
 
-export default function PortfolioGrid({ title = "Selected Works", items, viewMoreLink, linkPrefix }: PortfolioGridProps) {
+export default function PortfolioGrid({ title, items, viewMoreLink, linkPrefix }: PortfolioGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("Portfolio");
+  const resolvedTitle = title ?? t("selectedWorks");
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -57,7 +60,7 @@ export default function PortfolioGrid({ title = "Selected Works", items, viewMor
   return (
     <section className="py-24 px-6 md:px-12 max-w-[1600px] mx-auto" ref={gridRef}>
       <h2 className="text-4xl md:text-5xl font-heading text-neutral-cream mb-16 text-center">
-        {title}
+        {resolvedTitle}
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
@@ -93,14 +96,6 @@ export default function PortfolioGrid({ title = "Selected Works", items, viewMor
                 </div>
               )}
 
-              <div className="absolute inset-0 flex flex-col justify-end p-8 z-10 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <span className="text-brass font-body tracking-widest text-sm uppercase mb-2">
-                  {project.category}
-                </span>
-                <h3 className="text-2xl font-heading text-neutral-cream">
-                  {project.title}
-                </h3>
-              </div>
             </div>
           );
 
@@ -120,7 +115,7 @@ export default function PortfolioGrid({ title = "Selected Works", items, viewMor
         <div className="mt-16 flex justify-center">
           <Link href={viewMoreLink}>
             <Button variant="outline" size="lg" className="text-lg px-8 h-14 rounded-none uppercase tracking-widest font-body font-medium transition-colors hover:bg-neutral-cream hover:text-background border-neutral-cream text-neutral-cream">
-              View More
+              {t("viewMore")}
             </Button>
           </Link>
         </div>

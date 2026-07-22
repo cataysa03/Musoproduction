@@ -3,11 +3,14 @@
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { ParallaxServices } from "@/components/ParallaxServices";
 
 export default function ServicesContent({ showCta = true }: { showCta?: boolean }) {
+  const t = useTranslations("Services");
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -40,10 +43,10 @@ export default function ServicesContent({ showCta = true }: { showCta?: boolean 
 
         <section className="mb-32 fade-up">
           <h1 className="text-5xl md:text-7xl font-heading text-neutral-cream mb-8 max-w-4xl">
-            Methodology & Capabilities.
+            {t("heading")}
           </h1>
           <p className="text-xl md:text-2xl font-body text-neutral-grayBeige font-light max-w-3xl leading-relaxed">
-            We don't just shoot video; we architect visual experiences. Our methodology relies on deliberate pre-production, cinematic restraint, and flawless execution.
+            {t("intro")}
           </p>
         </section>
 
@@ -51,10 +54,9 @@ export default function ServicesContent({ showCta = true }: { showCta?: boolean 
 
         {showCta && (
           <div className="mt-32 fade-up text-center border-t border-deepAnchor-alt1 pt-16">
-            <p className="text-neutral-grayBeige font-body mb-8 text-lg">Project minimum engagements start at $25,000.</p>
             <Link href="/contact">
               <Button size="lg" className="text-lg px-8 h-14 rounded-none uppercase tracking-widest font-body font-medium transition-transform duration-300 hover:scale-105">
-                Inquire Now
+                {t("inquireNow")}
               </Button>
             </Link>
           </div>

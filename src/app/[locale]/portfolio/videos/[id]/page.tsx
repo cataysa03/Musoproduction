@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import ClientWrapper from "./ClientWrapper";
 import { ShowcaseProject } from "@/components/CinematicVideoShowcase";
 import { supabase } from "@/lib/supabase";
+import { pickLocalized } from "@/lib/localizedField";
 
 export const revalidate = 0;
 
-export default async function VideoProjectPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function VideoProjectPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
+  const { id, locale } = await params;
 
   const { data: videoProjects } = await supabase
     .from("projects")
@@ -23,8 +24,8 @@ export default async function VideoProjectPage({ params }: { params: Promise<{ i
 
   const project: ShowcaseProject = {
     id: record.id,
-    title: record.title,
-    category: record.category,
+    title: pickLocalized(locale, record.title_tr, record.title_en),
+    category: pickLocalized(locale, record.category_tr, record.category_en),
     playbackId: record.media_url,
     client: record.client,
     year: record.year,

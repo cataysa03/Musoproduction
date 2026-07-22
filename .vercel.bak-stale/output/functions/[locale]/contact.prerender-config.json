@@ -1,0 +1,34 @@
+{
+  "type": "Prerender",
+  "expiration": 1,
+  "hasFallback": false,
+  "isDynamicRoute": true,
+  "group": 13,
+  "bypassToken": "308e4f8a98e4b8de1d4bcbcafed96446",
+  "experimentalBypassFor": [
+    {
+      "type": "header",
+      "key": "next-action"
+    },
+    {
+      "type": "header",
+      "key": "content-type",
+      "value": "multipart/form-data;.*"
+    }
+  ],
+  "fallback": null,
+  "initialHeaders": {
+    "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+  },
+  "allowQuery": [
+    "nxtPlocale"
+  ],
+  "allowHeader": [
+    "host",
+    "x-matched-path",
+    "x-prerender-revalidate",
+    "x-prerender-revalidate-if-generated",
+    "x-next-revalidated-tags",
+    "x-next-revalidate-tag-token"
+  ]
+}

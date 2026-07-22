@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_MvIitzpJer012niBwFLsqS6aGz0H",
+  "orgId": "team_yl8jnEqwC3kgGjx16NxNSxnA",
+  "projectName": "muso-production",
+  "settings": {
+    "createdAt": 1784684070498,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

@@ -5,6 +5,7 @@ import MuxPlayer from "@mux/mux-player-react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 export interface ShowcaseProject {
   id: number | string;
@@ -22,6 +23,8 @@ interface CinematicVideoShowcaseProps {
 }
 
 export default function CinematicVideoShowcase({ project, onNext }: CinematicVideoShowcaseProps) {
+  const t = useTranslations("CinematicVideoShowcase");
+  const locale = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -116,8 +119,8 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
   }, [project.id]);
 
   const year = project.year || new Date().getFullYear();
-  const clientName = project.client || "LÉANDRE MARCEAU";
-  const studioName = "MUSO PRODUCTION";
+  const clientName = project.client || t("defaultClientName");
+  const studioName = t("studioName");
 
   return (
     <div 
@@ -154,12 +157,12 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               {isPlaying ? (
                 <>
                   <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  [ ROLLING ]
+                  [ {t("rolling")} ]
                 </>
               ) : (
                 <>
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-cream/40" />
-                  [ {project.category.toUpperCase()} ]
+                  [ {project.category.toLocaleUpperCase(locale)} ]
                 </>
               )}
             </div>
@@ -174,7 +177,7 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               transition={!isPlaying ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}}
               className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-xs tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 backdrop-blur-sm transition-colors"
             >
-              {isPlaying ? "PAUSE" : "PLAY"}
+              {isPlaying ? t("pause") : t("play")}
             </motion.button>
           </div>
 
@@ -183,32 +186,32 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
             <button
               onClick={() => { if (playerRef.current) { setIsMuted(false); playerRef.current.play(); } }}
               className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
-              aria-label="Play"
+              aria-label={t("playAria")}
             >
-              [PLAY]
+              [{t("play")}]
             </button>
-            <button 
+            <button
               onClick={() => { if (playerRef.current) playerRef.current.pause() }}
               className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${!isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
-              aria-label="Pause"
+              aria-label={t("pauseAria")}
             >
-              [PAUSE]
+              [{t("pause")}]
             </button>
-            <button 
+            <button
               onClick={toggleFullscreen}
               className="text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
-              aria-label="Fullscreen"
+              aria-label={t("fullscreenAria")}
             >
-              [FULLSCREEN]
+              [{t("fullscreen")}]
             </button>
           </div>
 
           {/* Bottom Right: More Project */}
-          <button 
+          <button
             onClick={onNext}
             className="absolute bottom-6 right-6 font-mono text-xs tracking-[0.15em] text-neutral-cream hover:text-neutral-cream/70 transition-colors stagger-in flex items-center gap-2 pointer-events-auto"
           >
-            MORE PROJECT <span className="text-[8px]">■</span>
+            {t("moreProject")} <span className="text-[8px]">■</span>
           </button>
         </div>
 
@@ -230,11 +233,11 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               <h3 className="font-slab text-xl uppercase text-neutral-cream mb-4">{project.title}</h3>
               <div className="space-y-3 font-mono text-[10px] tracking-widest text-neutral-cream/70 uppercase">
                 <div className="grid grid-cols-2 gap-2 border-b border-neutral-cream/10 pb-2">
-                  <span>Client</span>
+                  <span>{t("clientLabel")}</span>
                   <span className="text-neutral-cream">{clientName}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 border-b border-neutral-cream/10 pb-2">
-                  <span>Year</span>
+                  <span>{t("yearLabel")}</span>
                   <span className="text-neutral-cream">{year}</span>
                 </div>
                 {project.credits?.map((credit, i) => (
@@ -252,9 +255,9 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
       {/* 2. Bezel Bar (Bottom Layer, ~8%) */}
       <div className="h-12 md:h-16 w-full shrink-0 bg-deepAnchor-alt2 border-t border-neutral-cream/5 flex items-center justify-between px-6 font-mono text-[10px] md:text-[11px] tracking-widest text-neutral-cream/60 uppercase rounded-b-[28px] z-20">
         <span>{year} © {clientName}</span>
-        <span className="hidden md:inline-block">CRAFTED BY {studioName}</span>
+        <span className="hidden md:inline-block">{t("craftedBy", { studio: studioName })}</span>
         <button className="text-brass hover:text-brass-alt transition-colors font-bold">
-          INQUIRE
+          {t("inquire")}
         </button>
       </div>
     </div>

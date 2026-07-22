@@ -6,9 +6,11 @@ import type MuxPlayerElement from "@mux/mux-player";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabase";
 
 export default function VideoHero() {
+  const t = useTranslations("VideoHero");
   const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
@@ -100,17 +102,17 @@ export default function VideoHero() {
       
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 p-6 pb-32 md:pb-48">
         <h1 className="text-4xl md:text-6xl lg:text-8xl font-heading text-neutral-cream text-center tracking-widest drop-shadow-2xl">
-          MUSO PRODUCTION
+          {t("brand")}
         </h1>
         <p className="mt-8 text-lg md:text-2xl text-neutral-grayBeige font-body font-light tracking-[0.2em] max-w-2xl text-center uppercase drop-shadow-md">
-          Cinematic Excellence
+          {t("tagline")}
         </p>
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center gap-3 mt-12 md:mt-16"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-grayBeige/80 font-body">Scroll</span>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-grayBeige/80 font-body">{t("scroll")}</span>
           <div className="w-[1px] h-10 md:h-16 bg-neutral-grayBeige/20 relative overflow-hidden">
             <motion.div 
               className="absolute top-0 left-0 w-full h-1/2 bg-neutral-cream"
@@ -144,7 +146,7 @@ export default function VideoHero() {
             >
               <img
                 src={src}
-                alt={`Showcase image ${index + 1}`}
+                alt={t("showcaseImageAlt", { index: index + 1 })}
                 className="w-full h-full object-cover rounded-2xl shadow-md border border-white/10"
               />
             </div>

@@ -1,5 +1,157 @@
 {
-  "Index": {
-    "title": "Welcome to Muso Production"
+  "Metadata": {
+    "home": {
+      "title": "Muso Production | Premium Cinematic Portfolio",
+      "description": "High-end cinematic production portfolio specializing in commercial, documentary and branded content."
+    },
+    "about": {
+      "title": "About | Muso Production",
+      "description": "Meet the cast and crew behind Muso Production's award-winning cinematic work."
+    },
+    "services": {
+      "title": "Services | Muso Production",
+      "description": "Commercial production, documentary filmmaking, and post-production & color grading services."
+    },
+    "contact": {
+      "title": "Contact | Muso Production",
+      "description": "Start a conversation about your next commercial, documentary or branded content project."
+    },
+    "portfolio": {
+      "title": "Portfolio | Muso Production",
+      "description": "Browse our photo and video portfolio of premium cinematic production work."
+    },
+    "portfolioPhotos": {
+      "title": "Photos Portfolio | Muso Production",
+      "description": "A showcase of our professional photography work."
+    },
+    "portfolioVideos": {
+      "title": "Videos Portfolio | Muso Production",
+      "description": "A showcase of our cinematic video production work."
+    }
+  },
+  "Header": {
+    "portfolio": "Portfolio",
+    "photos": "Photos",
+    "videos": "Videos",
+    "services": "Services",
+    "about": "About",
+    "inquire": "Inquire",
+    "logoAlt": "Muso Production logo",
+    "menuToggle": "Toggle menu",
+    "languageSwitcherLabel": "Switch language"
+  },
+  "Footer": {
+    "brand": "Muso Production",
+    "tagline": "Premium Cinematic Production Portfolio. We bring vision to life through authentic narrative and world-class post-production.",
+    "navigationHeading": "Navigation",
+    "portfolio": "Portfolio",
+    "services": "Services",
+    "about": "About",
+    "contact": "Contact",
+    "socialHeading": "Social",
+    "contactHeading": "Contact Us",
+    "instagram": "Instagram",
+    "copyright": "© {year} Muso Production. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "Home": {
+    "photosGridTitle": "Photos",
+    "videosGridTitle": "Videos",
+    "ctaHeading": "Ready to tell your story?",
+    "ctaBody": "We bring cinematic vision to commercial and documentary projects, delivering impact through authentic narrative and world-class production.",
+    "ctaButton": "Speak to an expert"
+  },
+  "About": {
+    "heroTitleLine1": "The Art of",
+    "heroTitleLine2": "Narrative.",
+    "heroIntro": "Muso Production is a premium cinematic production house. We believe in the power of visual storytelling to elevate brands, document truth, and create lasting impact through uncompromising aesthetic standards.",
+    "keyPersonnelHeading": "Key Personnel",
+    "team": [
+      { "name": "Elena Rostova", "role": "Executive Producer", "bio": "With 15 years in high-end commercial production, Elena orchestrates complex shoots across the globe." },
+      { "name": "Julian Vance", "role": "Director of Photography", "bio": "An award-winning cinematographer known for his mastery of natural light and atmospheric tension." },
+      { "name": "Marcus Thorne", "role": "Lead Colorist", "bio": "Specializing in the Midnight Palette, Marcus brings the final cinematic polish to every frame." }
+    ],
+    "pressHeading": "Press & Awards",
+    "awards": [
+      { "title": "Cannes Lions", "subtitle": "Gold Lion • Cinematography", "description": "Awarded for our groundbreaking visual work on the \"Midnight Sun\" global campaign." },
+      { "title": "D&AD Awards", "subtitle": "Yellow Pencil • Direction", "description": "Recognized for outstanding narrative direction in documentary storytelling." }
+    ],
+    "ctaHeading": "Ready to collaborate?",
+    "ctaButton": "Contact Us"
+  },
+  "Services": {
+    "heading": "Methodology & Capabilities.",
+    "intro": "We don't just shoot video; we architect visual experiences. Our methodology relies on deliberate pre-production, cinematic restraint, and flawless execution.",
+    "inquireNow": "Inquire Now"
+  },
+  "ParallaxServices": {
+    "sections": [
+      { "title": "Commercial Production", "subtitle": "01 — Commercial Production", "description": "We craft commercial campaigns that abandon static corporate tropes in favor of scene logic and deliberate pacing. By treating brand messages like film narratives, we command attention and establish technical authority before a single word of copy is read." },
+      { "title": "Documentary & Short Film", "subtitle": "02 — Documentary & Short Film", "description": "True luxury design treats whitespace as an active element; our documentary approach treats silence and observation the same way. We uncover the human element behind your organization through empathetic, restraint-driven storytelling." },
+      { "title": "Post-Production & Color", "subtitle": "03 — Post-Production & Color", "description": "The edit is where the film is truly written. We apply rigorous post-production standards, utilizing custom film grain textures, deep midnight blue anchors, and warm analog grading to evoke high-end cinema and luxury branding." }
+    ]
+  },
+  "Portfolio": {
+    "indexHeading": "Portfolio",
+    "chooseSection": "Choose a section",
+    "photosLink": "Photos",
+    "videosLink": "Videos",
+    "photosHeading": "Photos Portfolio",
+    "photosSubheading": "A showcase of our professional photography work",
+    "videosHeading": "Videos Portfolio",
+    "selectedWorks": "Selected Works",
+    "viewMore": "View More",
+    "galleryItemAlt": "Gallery item {id}"
+  },
+  "Contact": {
+    "backLink": "← Back to Portfolio",
+    "successHeading": "Received.",
+    "successBody": "We will review your inquiry and get back to you shortly.",
+    "step1Heading": "Let's start with the basics.",
+    "nameLabel": "Your Name",
+    "namePlaceholder": "Jane Doe",
+    "emailLabel": "Your Email",
+    "emailPlaceholder": "jane@example.com",
+    "continue": "Continue",
+    "step2Heading": "Tell us about the project.",
+    "projectTypeLabel": "Project Type",
+    "selectType": "Select a type",
+    "typeCommercial": "Commercial",
+    "typeDocumentary": "Documentary",
+    "typeBranded": "Branded Content",
+    "typeOther": "Other",
+    "otherProjectTypePlaceholder": "Please specify project type",
+    "descriptionLabel": "General Description",
+    "descriptionPlaceholder": "Tell us about your project...",
+    "back": "Back",
+    "submit": "Submit Inquiry",
+    "nameRequired": "Name is required",
+    "emailInvalid": "Invalid email address",
+    "projectTypeRequired": "Please select a project type",
+    "otherProjectTypeRequired": "Please specify the project type",
+    "descriptionRequired": "Please provide a general description"
+  },
+  "VideoHero": {
+    "brand": "MUSO PRODUCTION",
+    "tagline": "Cinematic Excellence",
+    "scroll": "Scroll",
+    "showcaseImageAlt": "Showcase image {index}"
+  },
+  "CinematicVideoShowcase": {
+    "defaultClientName": "LÉANDRE MARCEAU",
+    "studioName": "MUSO PRODUCTION",
+    "rolling": "ROLLING",
+    "play": "PLAY",
+    "pause": "PAUSE",
+    "playAria": "Play",
+    "pauseAria": "Pause",
+    "fullscreenAria": "Fullscreen",
+    "fullscreen": "FULLSCREEN",
+    "moreProject": "MORE PROJECT",
+    "clientLabel": "Client",
+    "yearLabel": "Year",
+    "craftedBy": "CRAFTED BY {studio}",
+    "inquire": "INQUIRE"
   }
 }

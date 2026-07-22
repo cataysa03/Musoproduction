@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import Image, { type ImageLoaderProps } from "next/image";
 import { useTranslations } from "next-intl";
 import MasonryGrid from "@/components/ui/masonry-grid";
 
@@ -12,10 +12,26 @@ interface GalleryItem {
 }
 
 const BATCH_SIZE = 12;
-// The Next.js image optimizer occasionally 500s when asked to resize many
-// distinct images at once. Retry a couple of times, then fall back to the
-// original file (bypassing the optimizer) rather than leaving a broken image.
-const MAX_RETRIES = 2;
+// Next.js's own image optimizer resizes on-demand with a single Node process,
+// which times out (500) when asked to resize a dozen+ distinct images at
+// once — exactly what this masonry grid does on load. Supabase Storage can
+// resize images on the fly via its render endpoint, which handles the same
+// concurrent load without choking, so route through that instead.
+function supabaseImageLoader({ src, width, quality }: ImageLoaderProps) {
+  const renderUrl = src.replace(
+    "/storage/v1/object/public/",
+    "/storage/v1/render/image/public/"
+  );
+  // resize=contain is required: without it, Supabase's transform endpoint
+  // leaves height at the original pixel value when only width is given,
+  // producing a badly distorted image (e.g. 640x5824 instead of 640x960).
+  return `${renderUrl}?width=${width}&quality=${quality ?? 75}&resize=contain`;
+}
+
+// Safety net in case the render endpoint ever fails: fall back to the
+// original file (fully bypassing image optimization) rather than leaving a
+// broken image.
+const MAX_RETRIES = 1;
 
 function GalleryImage({
   src,
@@ -43,8 +59,16 @@ function GalleryImage({
         sizes={sizes}
         className={loaded ? "w-full h-auto object-cover" : "hidden"}
         style={{ width: "100%", height: "auto" }}
-        loading={priority ? "eager" : "lazy"}
+        // Chromium's native `loading="lazy"` heuristic never fires for images
+        // inside this CSS-columns + Framer Motion masonry layout (transformed,
+        // column-repositioned elements throw off its viewport-distance guess),
+        // so images render as permanently stuck placeholders. The gallery
+        // already windows how many images are in the DOM via its own
+        // IntersectionObserver (BATCH_SIZE), so native lazy loading is both
+        // redundant and broken here — always eager-load what's rendered.
+        loading="eager"
         priority={priority}
+        loader={supabaseImageLoader}
         unoptimized={attempt >= MAX_RETRIES}
         onLoad={() => setLoaded(true)}
         onError={() => setAttempt((a) => a + 1)}
