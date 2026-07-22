@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import MuxPlayer from "@mux/mux-player-react";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
-import { X } from "lucide-react";
+import { X, Volume2, VolumeX } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 export interface ShowcaseProject {
@@ -84,10 +84,13 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
       if (isPlaying) {
         playerRef.current.pause();
       } else {
-        setIsMuted(false);
         playerRef.current.play();
       }
     }
+  };
+
+  const toggleMute = () => {
+    setIsMuted((prev: boolean) => !prev);
   };
 
   const toggleFullscreen = () => {
@@ -184,7 +187,7 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
           {/* Bottom Left: Transport Controls */}
           <div className="absolute bottom-6 left-6 flex items-center gap-4 font-mono text-xs tracking-[0.15em] stagger-in pointer-events-auto">
             <button
-              onClick={() => { if (playerRef.current) { setIsMuted(false); playerRef.current.play(); } }}
+              onClick={() => { if (playerRef.current) playerRef.current.play(); }}
               className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
               aria-label={t("playAria")}
             >
@@ -203,6 +206,14 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               aria-label={t("fullscreenAria")}
             >
               [{t("fullscreen")}]
+            </button>
+            <button
+              onClick={toggleMute}
+              className="flex items-center gap-1.5 text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
+              aria-label={isMuted ? t("unmuteAria") : t("muteAria")}
+            >
+              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+              [{isMuted ? t("unmute") : t("mute")}]
             </button>
           </div>
 
