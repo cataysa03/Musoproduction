@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Core brand colors */
+  --primary: #2563EB;
+  --primary-hover: #3B82F6;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #1E3A8A;
+  --secondary-foreground: #E7E2D9;
+
+  --background: #000000;
+  --foreground: #E7E2D9;
+
+  --muted: #1A1A2E;
+  --accent: #0F3460;
+  
+  --destructive: #EF4444;
+  --success: #10B981;
+
+  /* Font defaults */
+  --font-heading: 'Zodiak', 'Didot', serif;
+  --font-body: 'Satoshi', 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  /* Use smooth rendering for dark modes */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Film Grain Overlay.
+   Rendered as a small pre-rasterized noise tile (data URI) that the compositor
+   repeats, instead of a live feTurbulence CSS filter stretched across the full
+   viewport. A full-viewport SVG filter forces the browser to recompute noise
+   on the main thread on every scroll/composite frame, which is a well-known
+   scroll-jank source; a static repeating tile is rasterized once and then
+   composited cheaply like any other background image. */
+.film-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxODAnIGhlaWdodD0nMTgwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC42NScgbnVtT2N0YXZlcz0nMycgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjxmZUNvbG9yTWF0cml4IHR5cGU9J21hdHJpeCcgdmFsdWVzPScxIDAgMCAwIDAgMCAxIDAgMCAwIDAgMCAxIDAgMCAwIDAgMCAwLjYgMCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxODAnIGhlaWdodD0nMTgwJyBmaWx0ZXI9J3VybCgjbiknLz48L3N2Zz4=");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* Base resets for GSAP & Lenis smooth scrolling */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}

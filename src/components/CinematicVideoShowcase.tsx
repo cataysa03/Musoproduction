@@ -1,0 +1,262 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import MuxPlayer from "@mux/mux-player-react";
+import { motion, AnimatePresence } from "framer-motion";
+import gsap from "gsap";
+import { X } from "lucide-react";
+
+export interface ShowcaseProject {
+  id: number | string;
+  title: string;
+  category: string;
+  playbackId: string;
+  client?: string;
+  year?: number;
+  credits?: { role: string; name: string }[];
+}
+
+interface CinematicVideoShowcaseProps {
+  project: ShowcaseProject;
+  onNext: () => void;
+}
+
+export default function CinematicVideoShowcase({ project, onNext }: CinematicVideoShowcaseProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<any>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [isIdle, setIsIdle] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  
+  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync state with player
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
+    player.addEventListener("play", handlePlay);
+    player.addEventListener("pause", handlePause);
+
+    return () => {
+      player.removeEventListener("play", handlePlay);
+      player.removeEventListener("pause", handlePause);
+    };
+  }, [project.playbackId]); // Re-bind if playbackId changes, though ref is same
+
+  // Idle logic
+  useEffect(() => {
+    const resetIdle = () => {
+      setIsIdle(false);
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      if (isPlaying) {
+        idleTimeoutRef.current = setTimeout(() => setIsIdle(true), 3000);
+      }
+    };
+
+    const handleUserActivity = () => {
+      resetIdle();
+    };
+
+    window.addEventListener("mousemove", handleUserActivity);
+    window.addEventListener("touchstart", handleUserActivity);
+    window.addEventListener("keydown", handleUserActivity);
+
+    resetIdle();
+
+    return () => {
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      window.removeEventListener("mousemove", handleUserActivity);
+      window.removeEventListener("touchstart", handleUserActivity);
+      window.removeEventListener("keydown", handleUserActivity);
+    };
+  }, [isPlaying]);
+
+  const togglePlayback = () => {
+    if (playerRef.current) {
+      if (isPlaying) {
+        playerRef.current.pause();
+      } else {
+        setIsMuted(false);
+        playerRef.current.play();
+      }
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (containerRef.current) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        containerRef.current.requestFullscreen();
+      }
+    }
+  };
+
+  // GSAP Entrance
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".stagger-in",
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          stagger: 0.15,
+          ease: "cinematic",
+        }
+      );
+    }, containerRef);
+    return () => ctx.revert();
+  }, [project.id]);
+
+  const year = project.year || new Date().getFullYear();
+  const clientName = project.client || "LÉANDRE MARCEAU";
+  const studioName = "MUSO PRODUCTION";
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full aspect-[16/10] md:aspect-video max-h-[80vh] flex flex-col overflow-hidden rounded-[28px] shadow-2xl border border-neutral-cream/10 bg-deepAnchor mx-auto z-10"
+    >
+      {/* 1. Video Canvas (Top Layer, ~92%) */}
+      <div className="relative w-full flex-1 overflow-hidden rounded-t-[28px] bg-deepAnchor-alt2">
+        <MuxPlayer
+          ref={playerRef}
+          playbackId={project.playbackId}
+          style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" } as any}
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay="muted"
+          loop
+          muted={isMuted}
+        />
+
+        {/* --- HUD OVERLAYS --- */}
+        <div 
+          className={`absolute inset-0 z-10 transition-opacity duration-700 ease-cinematic pointer-events-none ${isIdle ? "opacity-15" : "opacity-100"}`}
+        >
+          {/* Enable pointer events only on interactive elements to not block clicks on the video if needed */}
+          
+          {/* Top Left: Logo + Tag */}
+          <div className="absolute top-6 left-6 flex items-center gap-3 stagger-in pointer-events-auto">
+            <div className="w-8 h-8 rounded-md bg-deepAnchor-alt2/50 backdrop-blur-md border border-neutral-cream/10 flex items-center justify-center font-bold text-neutral-cream">
+              M
+            </div>
+            <span className="font-mono text-xs tracking-[0.15em] text-neutral-cream uppercase">
+              {clientName}
+            </span>
+            <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-neutral-cream/70 bg-deepAnchor-alt2/50 backdrop-blur-sm border border-neutral-cream/10 px-2 py-1 rounded">
+              {isPlaying ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  [ ROLLING ]
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-cream/40" />
+                  [ {project.category.toUpperCase()} ]
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Center: Play Button */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            <motion.button
+              onClick={togglePlayback}
+              whileTap={{ scale: 0.94 }}
+              animate={!isPlaying ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+              transition={!isPlaying ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}}
+              className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-xs tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 backdrop-blur-sm transition-colors"
+            >
+              {isPlaying ? "PAUSE" : "PLAY"}
+            </motion.button>
+          </div>
+
+          {/* Bottom Left: Transport Controls */}
+          <div className="absolute bottom-6 left-6 flex items-center gap-4 font-mono text-xs tracking-[0.15em] stagger-in pointer-events-auto">
+            <button
+              onClick={() => { if (playerRef.current) { setIsMuted(false); playerRef.current.play(); } }}
+              className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
+              aria-label="Play"
+            >
+              [PLAY]
+            </button>
+            <button 
+              onClick={() => { if (playerRef.current) playerRef.current.pause() }}
+              className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${!isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
+              aria-label="Pause"
+            >
+              [PAUSE]
+            </button>
+            <button 
+              onClick={toggleFullscreen}
+              className="text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
+              aria-label="Fullscreen"
+            >
+              [FULLSCREEN]
+            </button>
+          </div>
+
+          {/* Bottom Right: More Project */}
+          <button 
+            onClick={onNext}
+            className="absolute bottom-6 right-6 font-mono text-xs tracking-[0.15em] text-neutral-cream hover:text-neutral-cream/70 transition-colors stagger-in flex items-center gap-2 pointer-events-auto"
+          >
+            MORE PROJECT <span className="text-[8px]">■</span>
+          </button>
+        </div>
+
+        {/* Info Panel Overlay */}
+        <AnimatePresence>
+          {showInfo && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute right-8 top-1/2 -translate-y-1/2 w-72 bg-deepAnchor-alt2/90 backdrop-blur-xl border border-neutral-cream/10 rounded-2xl p-6 z-30"
+            >
+              <button 
+                onClick={() => setShowInfo(false)}
+                className="absolute top-4 right-4 text-neutral-cream/70 hover:text-neutral-cream"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <h3 className="font-slab text-xl uppercase text-neutral-cream mb-4">{project.title}</h3>
+              <div className="space-y-3 font-mono text-[10px] tracking-widest text-neutral-cream/70 uppercase">
+                <div className="grid grid-cols-2 gap-2 border-b border-neutral-cream/10 pb-2">
+                  <span>Client</span>
+                  <span className="text-neutral-cream">{clientName}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 border-b border-neutral-cream/10 pb-2">
+                  <span>Year</span>
+                  <span className="text-neutral-cream">{year}</span>
+                </div>
+                {project.credits?.map((credit, i) => (
+                  <div key={i} className="grid grid-cols-2 gap-2 border-b border-neutral-cream/10 pb-2 last:border-0">
+                    <span>{credit.role}</span>
+                    <span className="text-neutral-cream">{credit.name}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* 2. Bezel Bar (Bottom Layer, ~8%) */}
+      <div className="h-12 md:h-16 w-full shrink-0 bg-deepAnchor-alt2 border-t border-neutral-cream/5 flex items-center justify-between px-6 font-mono text-[10px] md:text-[11px] tracking-widest text-neutral-cream/60 uppercase rounded-b-[28px] z-20">
+        <span>{year} © {clientName}</span>
+        <span className="hidden md:inline-block">CRAFTED BY {studioName}</span>
+        <button className="text-brass hover:text-brass-alt transition-colors font-bold">
+          INQUIRE
+        </button>
+      </div>
+    </div>
+  );
+}
