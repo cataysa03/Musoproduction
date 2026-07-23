@@ -159,7 +159,7 @@ const token = await client.jwt.signPlaybackId('PLAYBACK_ID', { type: 'playback',
 const event = client.webhooks.unwrap(rawBody, headers);
 // event.type ('video.asset.ready' | 'video.live_stream.active' | ...), event.data: Asset | LiveStream | ...
 ```
-Always verify webhook signatures with `webhooks.unwrap` rather than trusting payloads directly — this is the standard security boundary for Mux webhook consumers.
+Always verify webhook signatures with `webhooks.unwrap` rather than trsting payloads directly — this is the standard security boundary for Mux webhook consumers.
 
 ### Get delivery/bandwidth usage
 ```ts
