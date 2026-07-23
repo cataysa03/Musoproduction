@@ -15,6 +15,7 @@ export default function VideoHero() {
   const bgRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
 
+  const [isPlaying, setIsPlaying] = useState(false);
   const [playbackId, setPlaybackId] = useState("gMIu1TXznCuOzK1A6KJ4sMZqdv9TRAu2fzb02mc00S00P8");
   const [marqueeImages, setMarqueeImages] = useState<string[]>([
     "/images/sliding/DSC00327.JPG",
@@ -57,7 +58,16 @@ export default function VideoHero() {
     );
     observer.observe(container);
 
-    return () => observer.disconnect();
+    // Only reveal the video once frames are actually advancing, so viewers
+    // never see the frozen first frame while it buffers - it fades in
+    // already in motion.
+    const handlePlaying = () => setIsPlaying(true);
+    player.addEventListener("playing", handlePlaying);
+
+    return () => {
+      observer.disconnect();
+      player.removeEventListener("playing", handlePlaying);
+    };
   }, []);
 
   useEffect(() => {
@@ -92,11 +102,14 @@ export default function VideoHero() {
           ref={playerRef}
           playbackId={playbackId}
           autoPlay="muted"
+          preload="auto"
           loop
           muted
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
-          className="w-full h-full object-cover object-[50%_25%] md:object-center opacity-60 pointer-events-none"
+          className={`w-full h-full object-cover object-[50%_25%] md:object-center pointer-events-none transition-opacity duration-700 ease-out ${
+            isPlaying ? "opacity-60" : "opacity-0"
+          }`}
         />
       </div>
 
