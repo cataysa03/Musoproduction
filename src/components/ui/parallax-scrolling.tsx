@@ -45,38 +45,8 @@ export function ParallaxScrolling({
   const sectionRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  // Don't even mount the player until the section is nearly in view - if it
-  // starts fetching its manifest/segments at page load, it competes with
-  // the hero video for bandwidth and slows down the very first thing the
-  // visitor sees.
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || !video) return;
-
-    // Wide margin so this starts buffering well before the section is
-    // anywhere near the viewport - a fast scroll/flick can cover 200px in
-    // well under a second, which isn't enough lead time for the stream to
-    // start (leaving the static placeholder image visible when it arrives).
-    // 1500px gives it several seconds of head start at typical scroll
-    // speeds while still starting after (not competing with) the hero.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShouldLoadVideo(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "2000px 0px" }
-    );
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, [video]);
-
-  useEffect(() => {
-    if (!shouldLoadVideo) return;
     const section = sectionRef.current;
     const player = playerRef.current;
     if (!section || !player) return;
@@ -84,6 +54,13 @@ export function ParallaxScrolling({
     // The video keeps decoding/rendering frames even while scrolled far out
     // of view, which competes with the main thread for scroll performance.
     // Pause it once it leaves the viewport and resume when it re-enters.
+    // Deliberately mounted and buffering from page load rather than
+    // deferred until near-view: deferring saves some bandwidth contention
+    // with the hero at load, but on real-world connections the stream
+    // often hadn't finished buffering by the time a normal scroll reached
+    // it, leaving the static placeholder visible - worse than the
+    // contention it was meant to avoid. Loading immediately guarantees the
+    // maximum possible head start.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -106,7 +83,7 @@ export function ParallaxScrolling({
       observer.disconnect();
       player.removeEventListener("playing", handlePlaying);
     };
-  }, [shouldLoadVideo]);
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -154,6 +131,14 @@ export function ParallaxScrolling({
         className
       )}
     >
+      {video && (
+        <>
+          {/* Fetch the HLS manifest ahead of time, same as the hero, so
+              it's cached by the time the player's own JS requests it. */}
+          <link rel="preload" as="fetch" href={`https://stream.mux.com/${video.playbackId}.m3u8`} crossOrigin="anonymous" />
+          <link rel="preload" as="image" href={`https://image.mux.com/${video.playbackId}/thumbnail.jpg`} />
+        </>
+      )}
       <div
         data-parallax-layer="1"
         className="absolute -top-[20%] z-0 h-[140%] w-full"
@@ -185,20 +170,35 @@ export function ParallaxScrolling({
         className="absolute -top-[20%] z-20 h-[140%] w-full"
         style={{ willChange: "transform" }}
       >
-        {video && shouldLoadVideo ? (
-          <MuxPlayer
-            ref={playerRef}
-            playbackId={video.playbackId}
-            autoPlay="muted"
-            preload="auto"
-            loop
-            muted
-            playsInline
-            style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
-            className={`h-full w-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
-              isPlaying ? "opacity-100" : "opacity-0"
-            }`}
-          />
+        {video ? (
+          <>
+            {/* Instant blurred stand-in (the video's own thumbnail, not an
+                unrelated stock photo) so there's never a blank or
+                mismatched frame while it buffers - crossfades out once the
+                real video is actually moving. */}
+            <img
+              src={`https://image.mux.com/${video.playbackId}/thumbnail.jpg`}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              className={`absolute inset-0 h-full w-full object-cover scale-110 blur-2xl transition-opacity duration-500 ease-out ${
+                isPlaying ? "opacity-0" : "opacity-60"
+              }`}
+            />
+            <MuxPlayer
+              ref={playerRef}
+              playbackId={video.playbackId}
+              autoPlay="muted"
+              preload="auto"
+              loop
+              muted
+              playsInline
+              style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
+              className={`h-full w-full object-cover pointer-events-none transition-opacity duration-500 ease-out ${
+                isPlaying ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          </>
         ) : (
           <img
             src={images.front}
