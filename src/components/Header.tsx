@@ -146,6 +146,7 @@ export default function Header() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
             className="fixed inset-0 z-50 md:hidden bg-black/95 backdrop-blur-md pt-[calc(env(safe-area-inset-top)+5.5rem)] pb-[calc(env(safe-area-inset-bottom)+2rem)] px-8 flex flex-col overflow-y-auto"
+            onClick={() => setIsMenuOpen(false)}
           >
             <nav className="flex flex-col gap-1">
               {navLinks.map((link, index) => (
