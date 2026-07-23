@@ -83,10 +83,10 @@ export default function VideoHero() {
   const duplicatedImages = [...marqueeImages, ...marqueeImages]; // Ensure enough images for seamless marquee
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-deepAnchor" ref={containerRef}>
+    <section className="relative w-full h-[100svh] md:h-screen overflow-hidden bg-deepAnchor" ref={containerRef}>
       {/* Preload the poster */}
       <link rel="preload" as="image" href={`https://image.mux.com/${playbackId}/thumbnail.jpg`} fetchPriority="high" />
-      
+
       <div ref={bgRef} className="absolute inset-0 w-full h-full scale-[1.2]">
         <MuxPlayer
           ref={playerRef}
@@ -96,25 +96,25 @@ export default function VideoHero() {
           muted
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
-          className="w-full h-full object-cover opacity-60 pointer-events-none"
+          className="w-full h-full object-cover object-[50%_25%] md:object-center opacity-60 pointer-events-none"
         />
       </div>
-      
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 p-6 pb-32 md:pb-48">
-        <h1 className="text-4xl md:text-6xl lg:text-8xl font-heading text-neutral-cream text-center tracking-widest drop-shadow-2xl">
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-6 pt-[env(safe-area-inset-top)] pb-36 sm:pb-40 md:pb-48">
+        <h1 className="text-[clamp(1.85rem,9vw,2.75rem)] md:text-6xl lg:text-8xl font-heading text-neutral-cream text-center tracking-widest drop-shadow-2xl">
           {t("brand")}
         </h1>
-        <p className="mt-8 text-lg md:text-2xl text-neutral-grayBeige font-body font-light tracking-[0.2em] max-w-2xl text-center uppercase drop-shadow-md">
+        <p className="mt-4 md:mt-8 text-xs sm:text-sm md:text-2xl text-neutral-grayBeige font-body font-light tracking-[0.15em] md:tracking-[0.2em] leading-relaxed max-w-[85%] md:max-w-2xl text-center uppercase drop-shadow-md">
           {t("tagline")}
         </p>
         <motion.div
-          className="flex flex-col items-center gap-3 mt-12 md:mt-16"
+          className="flex flex-col items-center gap-2 md:gap-3 mt-8 md:mt-16"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-grayBeige/80 font-body">{t("scroll")}</span>
-          <div className="w-[1px] h-10 md:h-16 bg-neutral-grayBeige/20 relative overflow-hidden">
-            <motion.div 
+          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-neutral-grayBeige/80 font-body">{t("scroll")}</span>
+          <div className="w-[1px] h-8 md:h-16 bg-neutral-grayBeige/20 relative overflow-hidden">
+            <motion.div
               className="absolute top-0 left-0 w-full h-1/2 bg-neutral-cream"
               animate={{ y: ["-100%", "200%"] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
@@ -124,9 +124,9 @@ export default function VideoHero() {
       </div>
 
       {/* Animated Image Marquee */}
-      <div className="absolute -bottom-16 md:-bottom-24 left-0 w-full h-1/3 md:h-2/5 z-10 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
+      <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-24 left-0 w-full h-[28%] sm:h-[32%] md:h-2/5 z-10 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
         <motion.div
-          className="flex gap-4 w-max pr-4"
+          className="flex gap-3 md:gap-4 w-max pr-4 h-full items-center"
           animate={{
             x: ["0%", "-50%"],
             transition: {
@@ -139,7 +139,7 @@ export default function VideoHero() {
           {duplicatedImages.map((src, index) => (
             <div
               key={index}
-              className="relative aspect-[3/4] h-48 md:h-64 flex-shrink-0"
+              className="relative aspect-[3/4] h-32 sm:h-40 md:h-64 flex-shrink-0"
               style={{
                 rotate: `${(index % 2 === 0 ? -2 : 5)}deg`,
               }}
@@ -147,7 +147,7 @@ export default function VideoHero() {
               <img
                 src={src}
                 alt={t("showcaseImageAlt", { index: index + 1 })}
-                className="w-full h-full object-cover rounded-2xl shadow-md border border-white/10"
+                className="w-full h-full object-cover rounded-xl md:rounded-2xl shadow-md border border-white/10"
               />
             </div>
           ))}
