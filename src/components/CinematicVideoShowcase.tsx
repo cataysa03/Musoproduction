@@ -94,12 +94,22 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
   };
 
   const toggleFullscreen = () => {
-    if (containerRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        containerRef.current.requestFullscreen();
-      }
+    const player = playerRef.current;
+    if (!player) return;
+
+    // iOS Safari doesn't support Fullscreen API on arbitrary elements, only on
+    // <video> via webkitEnterFullscreen. mux-player's own requestFullscreen/
+    // exitFullscreen methods already handle that fallback internally, so we
+    // delegate to the player instead of the wrapping container div.
+    const media = player.media;
+    const isCurrentlyFullscreen =
+      !!(document.fullscreenElement || (document as any).webkitFullscreenElement) ||
+      !!(media?.webkitDisplayingFullscreen && media?.webkitPresentationMode === "fullscreen");
+
+    if (isCurrentlyFullscreen) {
+      player.exitFullscreen?.();
+    } else {
+      player.requestFullscreen?.();
     }
   };
 
@@ -178,7 +188,7 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               whileTap={{ scale: 0.94 }}
               animate={!isPlaying ? { scale: [1, 1.04, 1] } : { scale: 1 }}
               transition={!isPlaying ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}}
-              className="relative w-16 h-16 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 backdrop-blur-sm transition-colors"
+              className="relative w-16 h-16 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 transition-colors"
             >
               {isPlaying ? t("pause") : t("play")}
             </motion.button>
