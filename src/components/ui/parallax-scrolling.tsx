@@ -45,8 +45,32 @@ export function ParallaxScrolling({
   const sectionRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  // Don't even mount the player until the section is nearly in view - if it
+  // starts fetching its manifest/segments at page load, it competes with
+  // the hero video for bandwidth and slows down the very first thing the
+  // visitor sees.
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
 
   useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || !video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadVideo(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, [video]);
+
+  useEffect(() => {
+    if (!shouldLoadVideo) return;
     const section = sectionRef.current;
     const player = playerRef.current;
     if (!section || !player) return;
@@ -54,8 +78,6 @@ export function ParallaxScrolling({
     // The video keeps decoding/rendering frames even while scrolled far out
     // of view, which competes with the main thread for scroll performance.
     // Pause it once it leaves the viewport and resume when it re-enters.
-    // The 200px margin also gives it a head start buffering before it
-    // actually scrolls into view.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -78,7 +100,7 @@ export function ParallaxScrolling({
       observer.disconnect();
       player.removeEventListener("playing", handlePlaying);
     };
-  }, []);
+  }, [shouldLoadVideo]);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -157,7 +179,7 @@ export function ParallaxScrolling({
         className="absolute -top-[20%] z-20 h-[140%] w-full"
         style={{ willChange: "transform" }}
       >
-        {video ? (
+        {video && shouldLoadVideo ? (
           <MuxPlayer
             ref={playerRef}
             playbackId={video.playbackId}

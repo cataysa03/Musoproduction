@@ -7,37 +7,37 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabase";
 
-export default function VideoHero() {
+const DEFAULT_MARQUEE_IMAGES = [
+  "/images/sliding/DSC00327.JPG",
+  "/images/sliding/DSC00389.jpg",
+  "/images/sliding/DSC00549.jpg",
+  "/images/sliding/DSC00638.jpg",
+  "/images/sliding/DSC02342.jpg",
+  "/images/sliding/DSC04802-5.jpg",
+  "/images/sliding/DSC07812-2.JPG",
+  "/images/sliding/DSC09590.JPG",
+];
+
+interface VideoHeroProps {
+  /** Fetched server-side so the player mounts once with the right ID
+   *  instead of starting on a placeholder and restarting the whole HLS
+   *  handshake once the real one arrives client-side. */
+  initialPlaybackId?: string | null;
+  initialMarqueeImages?: string[] | null;
+}
+
+export default function VideoHero({ initialPlaybackId, initialMarqueeImages }: VideoHeroProps) {
   const t = useTranslations("VideoHero");
   const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackId, setPlaybackId] = useState("gMIu1TXznCuOzK1A6KJ4sMZqdv9TRAu2fzb02mc00S00P8");
-  const [marqueeImages, setMarqueeImages] = useState<string[]>([
-    "/images/sliding/DSC00327.JPG",
-    "/images/sliding/DSC00389.jpg",
-    "/images/sliding/DSC00549.jpg",
-    "/images/sliding/DSC00638.jpg",
-    "/images/sliding/DSC02342.jpg",
-    "/images/sliding/DSC04802-5.jpg",
-    "/images/sliding/DSC07812-2.JPG",
-    "/images/sliding/DSC09590.JPG",
-  ]);
-
-  useEffect(() => {
-    const fetchHeroData = async () => {
-      const { data } = await supabase.from("site_settings").select("*").eq("id", 1).single();
-      if (data) {
-        if (data.hero_video_playback_id) setPlaybackId(data.hero_video_playback_id);
-        if (data.hero_marquee_images?.length > 0) setMarqueeImages(data.hero_marquee_images);
-      }
-    };
-    fetchHeroData();
-  }, []);
+  const [playbackId] = useState(initialPlaybackId || "gMIu1TXznCuOzK1A6KJ4sMZqdv9TRAu2fzb02mc00S00P8");
+  const [marqueeImages] = useState<string[]>(
+    initialMarqueeImages?.length ? initialMarqueeImages : DEFAULT_MARQUEE_IMAGES
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -94,10 +94,30 @@ export default function VideoHero() {
 
   return (
     <section className="relative w-full h-[100svh] md:h-screen overflow-hidden bg-deepAnchor" ref={containerRef}>
-      {/* Preload the poster */}
+      {/* Preload the poster, open the connection to Mux's streaming domain
+          immediately, and fetch the HLS manifest itself ahead of time so
+          it's already sitting in cache by the time the player's own JS
+          initializes and requests it - skips a full network round-trip
+          off the critical path to first frame. */}
       <link rel="preload" as="image" href={`https://image.mux.com/${playbackId}/thumbnail.jpg`} fetchPriority="high" />
+      <link rel="preconnect" href="https://stream.mux.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://image.mux.com" crossOrigin="anonymous" />
+      <link rel="preload" as="fetch" href={`https://stream.mux.com/${playbackId}.m3u8`} crossOrigin="anonymous" fetchPriority="high" />
 
       <div ref={bgRef} className="absolute inset-0 w-full h-full scale-[1.2]">
+        {/* Instant stand-in so the hero never shows a blank/black frame
+            while the stream buffers - blurred so it reads as a loading
+            state rather than a stuck video, then crossfades out once the
+            real video is actually moving. */}
+        <img
+          src={`https://image.mux.com/${playbackId}/thumbnail.jpg`}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          className={`absolute inset-0 w-full h-full object-cover object-[50%_25%] md:object-center scale-110 blur-2xl transition-opacity duration-500 ease-out ${
+            isPlaying ? "opacity-0" : "opacity-40"
+          }`}
+        />
         <MuxPlayer
           ref={playerRef}
           playbackId={playbackId}
@@ -107,7 +127,7 @@ export default function VideoHero() {
           muted
           playsInline
           style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
-          className={`w-full h-full object-cover object-[50%_25%] md:object-center pointer-events-none transition-opacity duration-700 ease-out ${
+          className={`w-full h-full object-cover object-[50%_25%] md:object-center pointer-events-none transition-opacity duration-500 ease-out ${
             isPlaying ? "opacity-60" : "opacity-0"
           }`}
         />

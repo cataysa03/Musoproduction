@@ -18,11 +18,14 @@ export default async function Home({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Home" });
 
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("is_featured", true)
-    .order("created_at", { ascending: false });
+  const [{ data: projects }, { data: siteSettings }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("*")
+      .eq("is_featured", true)
+      .order("created_at", { ascending: false }),
+    supabase.from("site_settings").select("*").eq("id", 1).single(),
+  ]);
 
   const localize = (p: any) => ({
     ...p,
@@ -35,7 +38,10 @@ export default async function Home({
 
   return (
     <main className="w-full h-full relative">
-      <VideoHero />
+      <VideoHero
+        initialPlaybackId={siteSettings?.hero_video_playback_id}
+        initialMarqueeImages={siteSettings?.hero_marquee_images}
+      />
       <ServicesContent showCta={false} />
       <ParallaxScrolling />
       <PortfolioGrid title={t("photosGridTitle")} items={featuredPhotos} viewMoreLink="/portfolio/photos" />
