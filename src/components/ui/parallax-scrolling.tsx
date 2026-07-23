@@ -55,6 +55,12 @@ export function ParallaxScrolling({
     const section = sectionRef.current;
     if (!section || !video) return;
 
+    // Wide margin so this starts buffering well before the section is
+    // anywhere near the viewport - a fast scroll/flick can cover 200px in
+    // well under a second, which isn't enough lead time for the stream to
+    // start (leaving the static placeholder image visible when it arrives).
+    // 1500px gives it several seconds of head start at typical scroll
+    // speeds while still starting after (not competing with) the hero.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -62,7 +68,7 @@ export function ParallaxScrolling({
           observer.disconnect();
         }
       },
-      { rootMargin: "200px 0px" }
+      { rootMargin: "2000px 0px" }
     );
     observer.observe(section);
 
