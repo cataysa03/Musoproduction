@@ -38,7 +38,7 @@ export default function ServicesContent({ showCta = true }: { showCta?: boolean 
   }, []);
 
   return (
-    <div className="w-full min-h-screen bg-background pt-32 pb-24 relative">
+    <div className={`w-full md:min-h-screen bg-background pt-24 md:pt-32 relative ${showCta ? "pb-8 md:pb-24" : "pb-0 md:pb-4"}`}>
       <div className="max-w-[1600px] mx-auto px-6 md:px-12 relative z-10">
 
         <section className="mb-32 fade-up">

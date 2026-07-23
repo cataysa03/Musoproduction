@@ -149,14 +149,14 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
           {/* Enable pointer events only on interactive elements to not block clicks on the video if needed */}
           
           {/* Top Left: Logo + Tag */}
-          <div className="absolute top-6 left-6 flex items-center gap-3 stagger-in pointer-events-auto">
-            <div className="w-8 h-8 rounded-md bg-deepAnchor-alt2/50 backdrop-blur-md border border-neutral-cream/10 flex items-center justify-center font-bold text-neutral-cream">
+          <div className="absolute top-3 left-3 right-3 md:top-6 md:left-6 md:right-auto flex items-center gap-1.5 md:gap-3 stagger-in pointer-events-auto">
+            <div className="w-6 h-6 md:w-8 md:h-8 shrink-0 rounded-md bg-deepAnchor-alt2/50 backdrop-blur-md border border-neutral-cream/10 flex items-center justify-center text-xs md:text-base font-bold text-neutral-cream">
               M
             </div>
-            <span className="font-mono text-xs tracking-[0.15em] text-neutral-cream uppercase">
+            <span className="font-mono text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] text-neutral-cream uppercase truncate">
               {clientName}
             </span>
-            <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-neutral-cream/70 bg-deepAnchor-alt2/50 backdrop-blur-sm border border-neutral-cream/10 px-2 py-1 rounded">
+            <div className="flex items-center gap-1.5 md:gap-2 font-mono text-[8px] md:text-[10px] tracking-wide md:tracking-widest text-neutral-cream/70 bg-deepAnchor-alt2/50 backdrop-blur-sm border border-neutral-cream/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded shrink-0 whitespace-nowrap">
               {isPlaying ? (
                 <>
                   <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
@@ -178,52 +178,53 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
               whileTap={{ scale: 0.94 }}
               animate={!isPlaying ? { scale: [1, 1.04, 1] } : { scale: 1 }}
               transition={!isPlaying ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}}
-              className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-xs tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 backdrop-blur-sm transition-colors"
+              className="relative w-16 h-16 md:w-40 md:h-40 rounded-full border border-neutral-cream/60 flex items-center justify-center font-mono text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] text-neutral-cream stagger-in hover:bg-black/10 backdrop-blur-sm transition-colors"
             >
               {isPlaying ? t("pause") : t("play")}
             </motion.button>
           </div>
 
-          {/* Bottom Left: Transport Controls */}
-          <div className="absolute bottom-6 left-6 flex items-center gap-4 font-mono text-xs tracking-[0.15em] stagger-in pointer-events-auto">
+          {/* Bottom Bar: Transport Controls (left) + More Project (right), same level */}
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 md:bottom-6 md:left-6 md:right-6 flex items-center justify-between gap-x-2 stagger-in pointer-events-auto">
+            <div className="flex items-center gap-x-1.5 md:gap-4 font-mono text-[7.5px] md:text-xs md:tracking-[0.15em] whitespace-nowrap">
+              <button
+                onClick={() => { if (playerRef.current) playerRef.current.play(); }}
+                className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
+                aria-label={t("playAria")}
+              >
+                [{t("play")}]
+              </button>
+              <button
+                onClick={() => { if (playerRef.current) playerRef.current.pause() }}
+                className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${!isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
+                aria-label={t("pauseAria")}
+              >
+                [{t("pause")}]
+              </button>
+              <button
+                onClick={toggleFullscreen}
+                className="text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
+                aria-label={t("fullscreenAria")}
+              >
+                [{t("fullscreen")}]
+              </button>
+              <button
+                onClick={toggleMute}
+                className="flex items-center gap-0.5 md:gap-1.5 text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
+                aria-label={isMuted ? t("unmuteAria") : t("muteAria")}
+              >
+                {isMuted ? <VolumeX className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" /> : <Volume2 className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />}
+                [{isMuted ? t("unmute") : t("mute")}]
+              </button>
+            </div>
+
             <button
-              onClick={() => { if (playerRef.current) playerRef.current.play(); }}
-              className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
-              aria-label={t("playAria")}
+              onClick={onNext}
+              className="shrink-0 font-mono text-[7.5px] md:text-xs md:tracking-[0.15em] whitespace-nowrap text-neutral-cream hover:text-neutral-cream/70 transition-colors flex items-center gap-1 md:gap-2"
             >
-              [{t("play")}]
-            </button>
-            <button
-              onClick={() => { if (playerRef.current) playerRef.current.pause() }}
-              className={`hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic ${!isPlaying ? 'text-neutral-cream' : 'text-neutral-cream/70'}`}
-              aria-label={t("pauseAria")}
-            >
-              [{t("pause")}]
-            </button>
-            <button
-              onClick={toggleFullscreen}
-              className="text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
-              aria-label={t("fullscreenAria")}
-            >
-              [{t("fullscreen")}]
-            </button>
-            <button
-              onClick={toggleMute}
-              className="flex items-center gap-1.5 text-neutral-cream/70 hover:underline hover:text-neutral-cream transition-colors duration-300 ease-cinematic"
-              aria-label={isMuted ? t("unmuteAria") : t("muteAria")}
-            >
-              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-              [{isMuted ? t("unmute") : t("mute")}]
+              {t("moreProject")} <span className="text-[6px] md:text-[8px]">■</span>
             </button>
           </div>
-
-          {/* Bottom Right: More Project */}
-          <button
-            onClick={onNext}
-            className="absolute bottom-6 right-6 font-mono text-xs tracking-[0.15em] text-neutral-cream hover:text-neutral-cream/70 transition-colors stagger-in flex items-center gap-2 pointer-events-auto"
-          >
-            {t("moreProject")} <span className="text-[8px]">■</span>
-          </button>
         </div>
 
         {/* Info Panel Overlay */}

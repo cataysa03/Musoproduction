@@ -28,7 +28,13 @@ const MasonryGrid = <T,>({
   staggerDelay = 0.05,
 }: MasonryGridProps<T>) => {
   const containerRef = React.useRef(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.2 });
+  // `amount` is a fraction of the *whole* container's height. On mobile the
+  // grid falls back to a single CSS column (columns-1), so all items stack
+  // vertically and the container becomes much taller than on desktop's
+  // multi-column layout — a 20% threshold could require scrolling well past
+  // the point where items should already be visible. Trigger as soon as any
+  // part of the container enters the viewport instead.
+  const isInView = useInView(containerRef, { once: true, amount: 0 });
 
   const containerVariants: Variants = {
     hidden: {},
@@ -39,12 +45,15 @@ const MasonryGrid = <T,>({
     },
   };
 
+  // WebKit (Safari/iOS) mis-renders children with a `transform` (translate/scale)
+  // inside a CSS multi-column container (`column-count`/`columns-*`) — items can
+  // end up invisible or clipped instead of just animating in. This grid uses
+  // CSS columns for the masonry layout, so the entrance animation is opacity-only
+  // to avoid triggering that bug on mobile Safari.
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      y: 0,
-      scale: 1,
       transition: {
         duration: 0.5,
         ease: 'easeOut',

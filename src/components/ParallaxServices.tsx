@@ -59,7 +59,7 @@ export const ParallaxServices = () => {
                 <div
                     key={section.id}
                     ref={sectionRefs[index]}
-                    className={`min-h-screen py-24 flex flex-col md:flex-row items-center justify-center md:gap-40 gap-16 ${section.reverse ? 'md:flex-row-reverse' : ''}`}
+                    className={`pt-12 md:pt-24 flex flex-col md:flex-row items-center justify-center md:gap-40 gap-16 ${index === sections.length - 1 ? 'pb-0 md:pb-4' : 'pb-12 md:pb-24 md:min-h-screen'} ${section.reverse ? 'md:flex-row-reverse' : ''}`}
                 >
                     <motion.div style={{ y: translateContents[index] }} className="flex-1 max-w-lg">
                         <h2 className="text-sm font-body uppercase tracking-widest text-brass mb-6">{section.subtitle}</h2>
