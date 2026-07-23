@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MuxPlayer from "@mux/mux-player-react";
 import type MuxPlayerElement from "@mux/mux-player";
 import gsap from "gsap";
@@ -44,6 +44,7 @@ export function ParallaxScrolling({
 }: ParallaxScrollingProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<MuxPlayerElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -53,6 +54,8 @@ export function ParallaxScrolling({
     // The video keeps decoding/rendering frames even while scrolled far out
     // of view, which competes with the main thread for scroll performance.
     // Pause it once it leaves the viewport and resume when it re-enters.
+    // The 200px margin also gives it a head start buffering before it
+    // actually scrolls into view.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -65,7 +68,16 @@ export function ParallaxScrolling({
     );
     observer.observe(section);
 
-    return () => observer.disconnect();
+    // Only reveal the video once frames are actually advancing, so viewers
+    // never see the frozen first frame while it buffers - it fades in
+    // already in motion.
+    const handlePlaying = () => setIsPlaying(true);
+    player.addEventListener("playing", handlePlaying);
+
+    return () => {
+      observer.disconnect();
+      player.removeEventListener("playing", handlePlaying);
+    };
   }, []);
 
   useEffect(() => {
@@ -150,11 +162,14 @@ export function ParallaxScrolling({
             ref={playerRef}
             playbackId={video.playbackId}
             autoPlay="muted"
+            preload="auto"
             loop
             muted
             playsInline
             style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" }}
-            className="h-full w-full object-cover pointer-events-none"
+            className={`h-full w-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
+              isPlaying ? "opacity-100" : "opacity-0"
+            }`}
           />
         ) : (
           <img

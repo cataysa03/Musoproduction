@@ -28,6 +28,7 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -39,15 +40,24 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
     const player = playerRef.current;
     if (!player) return;
 
+    // Reset so the new video also fades in from a clean state instead of
+    // snapping straight to visible with a frozen frame.
+    setHasStartedPlaying(false);
+
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+    // Only reveal the video once frames are actually advancing, so viewers
+    // never see the frozen first frame while it buffers.
+    const handlePlaying = () => setHasStartedPlaying(true);
 
     player.addEventListener("play", handlePlay);
     player.addEventListener("pause", handlePause);
+    player.addEventListener("playing", handlePlaying);
 
     return () => {
       player.removeEventListener("play", handlePlay);
       player.removeEventListener("pause", handlePause);
+      player.removeEventListener("playing", handlePlaying);
     };
   }, [project.playbackId]); // Re-bind if playbackId changes, though ref is same
 
@@ -146,8 +156,11 @@ export default function CinematicVideoShowcase({ project, onNext }: CinematicVid
           ref={playerRef}
           playbackId={project.playbackId}
           style={{ width: "100%", height: "100%", objectFit: "cover", "--controls": "none" } as any}
-          className="absolute inset-0 w-full h-full object-cover"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
+            hasStartedPlaying ? "opacity-100" : "opacity-0"
+          }`}
           autoPlay="muted"
+          preload="auto"
           loop
           muted={isMuted}
         />
